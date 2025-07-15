@@ -1,5 +1,6 @@
 package com.audio.audiotranscribe.controller;
 
+import com.audio.audiotranscribe.service.TranscriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
@@ -23,26 +24,11 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class TranscriptionController {
 
-    private final OpenAiAudioTranscriptionModel TranscriptionModel;
+    private final TranscriptionService transcriptionService;
 
     @PostMapping
-    public ResponseEntity<String> transcribeAudio(
-            @RequestParam("file") MultipartFile file) throws IOException {
-        File tempFile = File.createTempFile("audio","wav");
-        file.transferTo(tempFile);
-        OpenAiAudioTranscriptionOptions options = OpenAiAudioTranscriptionOptions.builder()
-                .responseFormat(OpenAiAudioApi.TranscriptResponseFormat.TEXT)
-                .language("en")
-                .temperature(0f)
-                .build();
-
-        FileSystemResource audioFile = new FileSystemResource(tempFile);
-
-        AudioTranscriptionPrompt transcriptionRequest = new AudioTranscriptionPrompt(audioFile, options);
-        AudioTranscriptionResponse response = TranscriptionModel.call(transcriptionRequest);
-
-        tempFile.delete();
-        return new  ResponseEntity<>(response.getResult().getOutput(), HttpStatus.OK);
+    public ResponseEntity<String> transcribeAudio(@RequestParam("file") MultipartFile file) throws IOException {
+        return new  ResponseEntity<>(transcriptionService.transcribeAudio(file), HttpStatus.OK);
     }
 
 }
