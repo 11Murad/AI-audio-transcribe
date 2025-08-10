@@ -32,6 +32,7 @@ public class TranscriptionService {
         AudioTranscriptionResponse response = TranscriptionModel.call(transcriptionRequest);
 
         tempFile.delete();
+
         return response.getResult().getOutput();
 
     }
